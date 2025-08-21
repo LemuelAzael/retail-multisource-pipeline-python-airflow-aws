@@ -1,0 +1,124 @@
+version: "3.8"
+
+services:
+  #####################################################################
+  # MySQL - Base de datos fuente para pruebas y desarrollo
+  #####################################################################
+  mysql:
+    image: mysql:8
+    container_name: mysql-db
+    restart: always
+    env_file:
+      - .env                                   # Variables de entorno (usuario, contraseña, etc.)
+    ports:
+      - '3310:3306'                            # Puerto local 3310 → Puerto interno 3306
+    volumes:
+      - mysql_data:/var/lib/mysql              # Volumen persistente para almacenar datos
+
+  #####################################################################
+  # PostgreSQL - Base de datos interna de Airflow (metadata)
+  #####################################################################
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: airflow                   # Usuario que usará Airflow
+      POSTGRES_PASSWORD: airflow               # Contraseña del usuario
+      POSTGRES_DB: airflow                     # Nombre de la base de datos
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Volumen persistente para almacenar metadata
+
+  #####################################################################
+  # Airflow Webserver - Interfaz gráfica de administración de DAGs
+  #####################################################################
+  airflow-webserver:
+    build:
+      context: .                               # Construye desde el Dockerfile local
+    container_name: airflow-webserver
+    restart: always
+    depends_on:
+      - postgres                               # Requiere que PostgreSQL esté levantado
+    env_file:
+      - .env                                   # Variables de entorno de Airflow
+    ports:
+      - "8080:8080"                            # Acceso en localhost:8080
+    volumes:
+      - ./dags:/opt/airflow/dags               # DAGs del proyecto
+      - ./logs:/opt/airflow/logs               # Carpeta de logs
+      - ./scripts:/opt/airflow/scripts         # Scripts auxiliares
+      - ./data:/opt/airflow/data               # Archivos de datos
+      - ./modules:/opt/airflow/modules         # Módulos Python adicionales
+      - ./utils:/opt/airflow/utils             # Funciones utilitarias
+    command: >
+      bash -c "
+        airflow db upgrade &&                  # Prepara la base de datos
+        airflow users create                   # Crea usuario admin por defecto
+          --username admin 
+          --password admin 
+          --firstname Airflow 
+          --lastname Admin 
+          --role Admin 
+          --email admin@example.com &&
+        airflow webserver                      # Inicia el servidor web
+      "
+
+  #####################################################################
+  # Airflow Scheduler - Planifica y ejecuta las tareas de los DAGs
+  #####################################################################
+  airflow-scheduler:
+    build:
+      context: .                               # Construye desde el Dockerfile local
+    container_name: airflow-scheduler
+    restart: always
+    depends_on:
+      - airflow-webserver                      # Espera a que el webserver esté listo
+    env_file:
+      - .env
+    volumes:
+      - ./dags:/opt/airflow/dags               # Misma carpeta de DAGs
+      - ./logs:/opt/airflow/logs               # Misma carpeta de logs
+      - ./scripts:/opt/airflow/scripts         # Scripts auxiliares
+      - ./data:/opt/airflow/data               # Archivos de datos
+      - ./modules:/opt/airflow/modules         # Módulos Python adicionales
+      - ./utils:/opt/airflow/utils             # Funciones utilitarias
+    command: airflow scheduler                 # Inicia el planificador de tareas
+
+  #####################################################################
+  # Jupyter Lab - Entorno interactivo para análisis y prototipado
+  #####################################################################
+  jupyter-lab:
+    build:
+      context: .                               # Contexto raíz del proyecto
+      dockerfile: Dockerfile                   # Usa el Dockerfile de la raíz
+    image: retail-pipeline/jupyter-lab:latest  # Imagen personalizada
+    container_name: jupyter-lab
+    restart: always
+    ports:
+      - "8200:8888"                            # Acceso en localhost:8200
+    command: >
+      jupyter lab 
+      --ip=0.0.0.0 
+      --port=8888 
+      --no-browser 
+      --allow-root 
+      --NotebookApp.token='' 
+      --NotebookApp.password=''                # Sin autenticación (solo para dev local)
+    working_dir: /home/jovyan/project          # Directorio de trabajo en el contenedor
+    volumes:
+      - ./:/home/jovyan/project                # Monta todo el proyecto dentro del contenedor
+    env_file:
+      - .env
+    depends_on:
+      - mysql                                  # Depende de MySQL como fuente de datos
+
+#####################################################################
+# Volúmenes persistentes para bases de datos
+#####################################################################
+volumes:
+  mysql_data:
+  postgres_data:
+
+
+
+

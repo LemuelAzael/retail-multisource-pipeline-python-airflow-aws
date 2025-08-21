@@ -1,0 +1,58 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# --- Entornos virtuales ---
+.venv/
+venv/
+env/
+ENV/
+*.env
+.env.*
+
+# --- Configuración de IDEs/editores ---
+.vscode/
+.idea/
+*.swp
+*~
+
+# --- Archivos de logs y temporales ---
+logs/
+*.log
+*.tmp
+*.out
+
+# --- Jupyter Notebooks ---
+.ipynb_checkpoints/
+
+# --- Docker ---
+.docker/
+.dockerignore
+docker-compose.override.yml
+
+# --- Airflow ---
+# Carpeta de logs de Airflow
+airflow/logs/
+
+# Base de datos SQLite de Airflow (si usas local executor)
+airflow/airflow.db
+airflow/airflow.db-journal
+
+# Configuración sensible de Airflow
+airflow/airflow.cfg
+airflow/webserver_config.py
+
+# --- Datos locales ---
+data/
+
+# --- AWS / Azure / Credenciales ---
+*.pem
+*.key
+*.crt
+*.der
+*.p12
