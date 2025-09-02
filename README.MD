@@ -159,11 +159,13 @@ s3://retail-multisource-pipeline/
 Lemuel Azael Carrillo Barrera  
 Proyecto para portafolio de ingeniería de datos.
 
+🔗 [Sobre mí](https://www.notion.so/Perfil-profesional-Lemuel-Azael-Carrillo-Barrera-2619ec6ab8528025b300d6099cd92add?source=copy_link)
+
 ## 📚 Desarrollo completo del proyecto
 
 Revisa todo el proceso paso a paso: desde la configuración inicial hasta la ejecución automatizada en AWS.
 
-🔎 [Ver desarrollo completo en Notion](https://www.notion.so/Data-Pipeline-for-Retail-using-Airflow-and-AWS-2559ec6ab852800f9108f64a304736df?source=copy_link)
+🔎 [Ver desarrollo completo en Notion](https://www.notion.so/Data-Pipeline-for-Retail-using-Airflow-and-AWS-2619ec6ab8528051a6d2c7d1dbcf24ed?source=copy_link)
 
 ## 🌐 Portafolio completo
 
